@@ -7,7 +7,7 @@ __pycache__/
 .idea/
 *.swp
 
-# Python (Flask backend)
+# Python (Flask backend)s
 *.py[cod]
 *.pyo
 *.pyd
