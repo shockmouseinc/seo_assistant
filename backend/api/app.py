@@ -1,14 +1,17 @@
 from threading import Thread
+from flask_cors import CORS
 from celery import Celery
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from flask import Flask, request, jsonify, url_for
 from backend.services.scraper_service import get_search_results, run_serp_spider
 from backend.tasks import run_serp_spider
+from models.assistants.post_idea_generator import get_post_ideas
 from seo_crawler.seo_crawler.spiders.serp_spider import SerpSpider
 # from backend.services.content_generation_service import generate_new_blog_post
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize Celery
 def make_celery(app):
@@ -29,6 +32,18 @@ def search():
     search_results = get_search_results(keyword)
 
     return jsonify(search_results=search_results)
+
+@app.route('/api/generate_post_ideas', methods=['POST'])
+def generate_post_ideas():
+    try:
+        user_prompt = request.json['user_prompt']
+    except (TypeError, KeyError):
+        return jsonify({"error": "Invalid request, user prompt missing."}), 400
+
+    # Call model to generate response
+    post_ideas = get_post_ideas(user_prompt)
+
+    return jsonify(post_ideas=post_ideas)
 
 @app.route('/api/task_status/<task_id>', methods=['GET'])
 def task_status(task_id):
@@ -75,4 +90,4 @@ def crawl():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
