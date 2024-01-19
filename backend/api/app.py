@@ -37,11 +37,13 @@ def search():
 def generate_post_ideas():
     try:
         user_prompt = request.json['user_prompt']
+        language = request.json['language']
+        tone = request.json['tone']
     except (TypeError, KeyError):
         return jsonify({"error": "Invalid request, user prompt missing."}), 400
 
     # Call model to generate response
-    post_ideas = get_post_ideas(user_prompt)
+    post_ideas = get_post_ideas(user_prompt, language, tone)
 
     return jsonify(post_ideas=post_ideas)
 
